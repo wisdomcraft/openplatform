@@ -1,0 +1,92 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>test</title>
+<style type="text/css">
+button{
+    cursor:pointer;
+}
+.mytable{
+    margin:50px auto 0 auto;
+    width:auto;
+}
+main{
+    margin:20px auto;
+    padding:20px;
+    width:96%;
+    max-width:1200px;
+    min-height:100px;
+    border:1px solid #dddddd;
+}
+</style>
+</head>
+<body>
+<table class="mytable">
+    <tr>
+        <td>token</td>
+        <td><input id="token" value="adf0893b97aeef380fb05bb082d10f4778fcc057" /></td>
+    </tr>
+    <tr>
+        <td>文件</td>
+        <td><input type="file" id="myfile" /></td>
+    </tr>
+    <tr>
+        <td colspan="2" align="center"><button id="mybutton" type="button">提交</button></td>
+    </tr>
+</table>
+<main id="main">
+</main>
+<script type="text/javascript">
+document.getElementById("mybutton").onclick = function(){
+    document.getElementById("main").innerHTML = "";
+    
+    token       = document.getElementById("token").value.trim();
+    if(token.length === 0){
+        alert("error, token empty");
+        return false;
+    }else if(token.length !== 40){
+        alert("error, token is incorrect about length");
+        return false;
+    }
+    
+    let files   = document.getElementById('myfile').files;
+    if(files.length === 0) return false;
+
+    let file    = files[0];
+
+    let type    = file.type;
+    console.log(type);
+    /*
+    if('image/gif,image/jpeg,image/png,image/jpg,image/bm'.indexOf(type) === -1){
+        toastr.error('仅允许上传视频文件, 且mp4和flv');
+        return false;
+    }
+    */
+    
+    var data = new FormData(); 
+    data.append('video_file', file);
+    data.append('video_md5',  "123456789");
+    
+    var xmlhttp;
+    if (window.XMLHttpRequest){
+        xmlhttp = new XMLHttpRequest();
+    }else{
+        xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+    }
+    
+    xmlhttp.onreadystatechange=function(){
+        if (xmlhttp.readyState==4 && xmlhttp.status==200){
+            console.log(xmlhttp.responseText);
+            document.getElementById("main").innerHTML += "<p>" + xmlhttp.responseText + "</p>";
+        }
+    }
+    
+    xmlhttp.open("POST", 'http://8.141.72.197:8100/api/open/task/upload', true);
+    xmlhttp.setRequestHeader('Accept',          'application/json');
+    xmlhttp.setRequestHeader('Authorization',   'Bearer ' + token);
+    xmlhttp.send(data);
+}
+</script>
+</body>
+</html>
